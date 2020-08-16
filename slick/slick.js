@@ -65,6 +65,7 @@
                 infinite: true,
                 initialSlide: 0,
                 lazyLoad: 'ondemand',
+                delayedProgressive: 50,
                 mobileFirst: false,
                 pauseOnHover: true,
                 pauseOnFocus: true,
@@ -1544,57 +1545,57 @@
             loadRange, cloneRange, rangeStart, rangeEnd;
 
         function loadImages(imagesScope) {
+            setTimeout(() => {
+                $('img[data-lazy]', imagesScope).each(function() {
 
-            $('img[data-lazy]', imagesScope).each(function() {
-
-                var image = $(this),
-                    imageSource = $(this).attr('data-lazy'),
-                    imageSrcSet = $(this).attr('data-srcset'),
-                    imageSizes  = $(this).attr('data-sizes') || _.$slider.attr('data-sizes'),
-                    imageToLoad = document.createElement('img');
-
-                imageToLoad.onload = function() {
-
-                    image
-                        .animate({ opacity: 0 }, 100, function() {
-
-                            if (imageSrcSet) {
-                                image
-                                    .attr('srcset', imageSrcSet );
-
-                                if (imageSizes) {
+                    var image = $(this),
+                        imageSource = $(this).attr('data-lazy'),
+                        imageSrcSet = $(this).attr('data-srcset'),
+                        imageSizes  = $(this).attr('data-sizes') || _.$slider.attr('data-sizes'),
+                        imageToLoad = document.createElement('img');
+    
+                    imageToLoad.onload = function() {
+    
+                        image
+                            .animate({ opacity: 0 }, 100, function() {
+    
+                                if (imageSrcSet) {
                                     image
-                                        .attr('sizes', imageSizes );
+                                        .attr('srcset', imageSrcSet );
+    
+                                    if (imageSizes) {
+                                        image
+                                            .attr('sizes', imageSizes );
+                                    }
                                 }
-                            }
-
-                            image
-                                .attr('src', imageSource)
-                                .animate({ opacity: 1 }, 200, function() {
-                                    image
-                                        .removeAttr('data-lazy data-srcset data-sizes')
-                                        .removeClass('slick-loading');
-                                });
-                            _.$slider.trigger('lazyLoaded', [_, image, imageSource]);
-                        });
-
-                };
-
-                imageToLoad.onerror = function() {
-
-                    image
-                        .removeAttr( 'data-lazy' )
-                        .removeClass( 'slick-loading' )
-                        .addClass( 'slick-lazyload-error' );
-
-                    _.$slider.trigger('lazyLoadError', [ _, image, imageSource ]);
-
-                };
-
-                imageToLoad.src = imageSource;
-
-            });
-
+    
+                                image
+                                    .attr('src', imageSource)
+                                    .animate({ opacity: 1 }, 200, function() {
+                                        image
+                                            .removeAttr('data-lazy data-srcset data-sizes')
+                                            .removeClass('slick-loading');
+                                    });
+                                _.$slider.trigger('lazyLoaded', [_, image, imageSource]);
+                            });
+    
+                    };
+    
+                    imageToLoad.onerror = function() {
+    
+                        image
+                            .removeAttr( 'data-lazy' )
+                            .removeClass( 'slick-loading' )
+                            .addClass( 'slick-lazyload-error' );
+    
+                        _.$slider.trigger('lazyLoadError', [ _, image, imageSource ]);
+    
+                    };
+    
+                    imageToLoad.src = imageSource;
+    
+                });
+            }, _.options.delayedProgressive)
         }
 
         if (_.options.centerMode === true) {
